@@ -10,9 +10,9 @@
   "date": "2026-10-29",
   "linux_cpu_checks": {
     "dense_core_import": "passed",
-    "megtron_core_import": "passed (CPU environment without TE/Apex; fallback imports only)",
     "moe_depth_mixer_initial_identity_and_finite_backward": "passed",
-    "representative_dense_configs": "baseline, mudd, dd10, blockattnres8 at 100M/20N and baseline 700M/5N: training, optimizer, scheduler and architecture matched saved recipes; only additional disabled hc_streams=0/attnres_block_size=0 allowed"
+    "representative_dense_configs": "baseline, mudd, dd10, blockattnres8 at 100M/20N and baseline 700M/5N: training, optimizer, scheduler and architecture matched saved recipes; only additional disabled hc_streams=0/attnres_block_size=0 allowed",
+    "megatron_core_import": "passed (CPU environment without TE/Apex; fallback imports only)"
   },
   "privacy_scan": {
     "credential_patterns_found": 0,

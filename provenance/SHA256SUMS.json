@@ -1,5 +1,5 @@
 {
-  ".gitignore": "1655e84e01f634470bed2f671b22bd9e460b84d9a9414ddc3ca580512b1100d5",
+  ".gitignore": "9658f5e2fd4a4d44ebdc82d11e939047b8522ba0b8f75aab71639fa9d5b9a269",
   "README.md": "4335e9d32989722b3ed10543d43b0b390e29d16809801cb209e601f64d102bcf",
   "dense/configs/rr100-base-wsd-10N-1017-edu350-128k-4gpu.json": "6b0abb127e605b748321597d8fe5c51014ffd766de4cc096a24c307e16d85f27",
   "dense/configs/rr100-base-wsd-20N-1017-edu350-128k-4gpu.json": "922701b8ee3c60219b6d5244b0c32673db38c8efc32f51342f86981e7a4ea0c1",
@@ -255,7 +255,7 @@
   "moe/variants/small/residuals.py": "9e86d719c96c73b362ff865dac0bb61b77bbca4dd7766b88b53fa3531c6e772d",
   "provenance/configs.json": "e72a77061baf0ad721714770e92e878238e88e54b6788777442f85e6dcefdd20",
   "provenance/source-files.json": "53cbbd7dbd3a2075abaf1a30df3588de793219309b98834d95af23248a54dcce",
-  "provenance/validation.json": "b067e06c0b5c2f4f2214e905639ef999f50a9ed3ecb46bc24cceaa8a30684338",
+  "provenance/validation.json": "05f72debdccfa3f2f1c4482dc422e4ac71c78401098462deb19997218af78f5a",
   "results/results-0shot.csv": "303e2009f6068fe490eaa1a4d36bca760d40dc1ee1a5b6a922fbe3799dbeac4e",
   "results/results-5shot.csv": "95e6fafec6b712fea370373d8f311dadb97f9d7007d71adf9c626f8e504f6b76",
   "results/routed-residuals-downstream-0shot-5shot.pdf": "fe78a376fa351b2e2939e669e1e396218cb4b623ecfd1395c5c57bd124cbf73d",
