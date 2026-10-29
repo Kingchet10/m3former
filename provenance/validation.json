@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "python_files_parsed": 666,
+  "source_hashes_verified": 676,
+  "dense_configs_checked": 66,
+  "moe_configs_checked": 6,
+  "scheduler_boundaries": "passed",
+  "portable_command_expansion": "passed",
+  "gpu_training_tested": false,
+  "date": "2026-10-29",
+  "linux_cpu_checks": {
+    "dense_core_import": "passed",
+    "megtron_core_import": "passed (CPU environment without TE/Apex; fallback imports only)",
+    "moe_depth_mixer_initial_identity_and_finite_backward": "passed",
+    "representative_dense_configs": "baseline, mudd, dd10, blockattnres8 at 100M/20N and baseline 700M/5N: training, optimizer, scheduler and architecture matched saved recipes; only additional disabled hc_streams=0/attnres_block_size=0 allowed"
+  },
+  "privacy_scan": {
+    "credential_patterns_found": 0,
+    "cluster_absolute_paths_found": 0,
+    "data_or_weight_binaries_found": 0
+  },
+  "limitations": [
+    "No new GPU training, fused-kernel execution, or distributed checkpoint restore test performed on this extracted tree",
+    "MoE TE/FlashAttention GPU runtime was not available on the development CPU host",
+    "Representative dynamic config resolution covers five recipes, static invariants cover all 72",
+    "Historical result CSVs were not recomputed from this export"
+  ]
+}

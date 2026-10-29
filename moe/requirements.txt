@@ -1,0 +1,8 @@
+# Versions read from the completed large-MoE runtime.json, CUDA 12.8 / H200.
+# Install matching CUDA wheels/builds in a separate MoE environment.
+# These pins do not install NVIDIA drivers, nvcc, or the CUDA toolkit.
+torch==2.9.0
+transformer-engine==2.11.0
+flash-attn==2.8.3
+triton==3.5.0
+numpy==1.26.4

@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+._*
+data/
+runs/
+checkpoints/
+*.pt
+*.bin
+*.safetensors
+*.log
+.env
+wandb/
+

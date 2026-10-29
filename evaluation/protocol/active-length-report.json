@@ -1,0 +1,707 @@
+{
+  "status": "length_audit_complete",
+  "phase": "CPU prompt length audit; no GPU evaluation",
+  "harness_commit": "d6de81643928d653435c431bae19945d41d32520",
+  "tokenizer_sha256": "9e556afd44213b6bd1be2b850ebbbd98f5481437a8021afaf58ee7fb1818d347",
+  "add_bos": false,
+  "fewshot_seed": 47,
+  "length_definition": "max candidate joint context+continuation tokens per evaluation document; conservative includes final target token",
+  "tasks": {
+    "LAMBADA/0": {
+      "dataset": "cimec/lambada",
+      "revision": "5953bd97664b64b95754f299b2309ecfbfbe81b9",
+      "dataset_config": null,
+      "task_name": "lambada_standard",
+      "eval_split": "test",
+      "demo_split": null,
+      "documents": 5153,
+      "requests": 5153,
+      "median": 85.0,
+      "p95": 113.0,
+      "p99": 131.0,
+      "max": 242,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-LAMBADA-0shot.jsonl.gz",
+      "requests_sha256": "0b68a77fb2c7b9c6aefb0d64f295281cd537c33e46c1e5a837e47055686d2ef9"
+    },
+    "LAMBADA/5": {
+      "dataset": "cimec/lambada",
+      "revision": "5953bd97664b64b95754f299b2309ecfbfbe81b9",
+      "dataset_config": null,
+      "task_name": "lambada_standard",
+      "eval_split": "test",
+      "demo_split": "validation",
+      "documents": 5153,
+      "requests": 5153,
+      "median": 541.0,
+      "p95": 604.0,
+      "p99": 641.0,
+      "max": 783,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-LAMBADA-5shot.jsonl.gz",
+      "requests_sha256": "7583d046bface4046d66ab3a0a943704bf05dac01f59004b8d45154b969b9077"
+    },
+    "PIQA/0": {
+      "dataset": "baber/piqa",
+      "revision": "142f6d7367fd9877f0fb3b5734ea6a545f54cdd1",
+      "dataset_config": null,
+      "task_name": "piqa",
+      "eval_split": "validation",
+      "demo_split": null,
+      "documents": 1838,
+      "requests": 3676,
+      "median": 35.0,
+      "p95": 99.14999999999986,
+      "p99": 157.0,
+      "max": 296,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-PIQA-0shot.jsonl.gz",
+      "requests_sha256": "8cee3e0fec9fdf15fd951124c161fd1727ea63f9a8e73094ca6bb3bfb8111f4e"
+    },
+    "PIQA/5": {
+      "dataset": "baber/piqa",
+      "revision": "142f6d7367fd9877f0fb3b5734ea6a545f54cdd1",
+      "dataset_config": null,
+      "task_name": "piqa",
+      "eval_split": "validation",
+      "demo_split": "train",
+      "documents": 1838,
+      "requests": 3676,
+      "median": 251.0,
+      "p95": 400.14999999999986,
+      "p99": 495.25999999999976,
+      "max": 971,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-PIQA-5shot.jsonl.gz",
+      "requests_sha256": "75fee1386e3217240a767a92e97c6268fe30decbf6c59568f8d7917a8aa901b3"
+    },
+    "WinoGrande/0": {
+      "dataset": "allenai/winogrande",
+      "revision": "01e74176c63542e6b0bcb004dcdea22d94fb67b5",
+      "dataset_config": "winogrande_xl",
+      "task_name": "winogrande",
+      "eval_split": "validation",
+      "demo_split": null,
+      "documents": 1267,
+      "requests": 2534,
+      "median": 25.0,
+      "p95": 34.0,
+      "p99": 37.33999999999992,
+      "max": 45,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-WinoGrande-0shot.jsonl.gz",
+      "requests_sha256": "01dfe4f109304532f0a85434a40b1750c4cae6d00699c8a410ad4586236805d4"
+    },
+    "WinoGrande/5": {
+      "dataset": "allenai/winogrande",
+      "revision": "01e74176c63542e6b0bcb004dcdea22d94fb67b5",
+      "dataset_config": "winogrande_xl",
+      "task_name": "winogrande",
+      "eval_split": "validation",
+      "demo_split": "train",
+      "documents": 1267,
+      "requests": 2534,
+      "median": 162.0,
+      "p95": 182.0,
+      "p99": 191.0,
+      "max": 209,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-WinoGrande-5shot.jsonl.gz",
+      "requests_sha256": "f82ee1def549045862f1c911dcb3795c61a26b23e2f8b8c9d0e158d1bed7a8a7"
+    },
+    "ARC-E/0": {
+      "dataset": "allenai/ai2_arc",
+      "revision": "210d026faf9955653af8916fad021475a3f00453",
+      "dataset_config": "ARC-Easy",
+      "task_name": "arc_easy",
+      "eval_split": "test",
+      "demo_split": null,
+      "documents": 2376,
+      "requests": 9501,
+      "median": 32.0,
+      "p95": 73.0,
+      "p99": 94.75,
+      "max": 206,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-ARC-E-0shot.jsonl.gz",
+      "requests_sha256": "65752f03bcff7766c7cc0ae7b45a2a63866466a169bc3f4ca4d2982bac27de82"
+    },
+    "ARC-E/5": {
+      "dataset": "allenai/ai2_arc",
+      "revision": "210d026faf9955653af8916fad021475a3f00453",
+      "dataset_config": "ARC-Easy",
+      "task_name": "arc_easy",
+      "eval_split": "test",
+      "demo_split": "train",
+      "documents": 2376,
+      "requests": 9501,
+      "median": 218.0,
+      "p95": 296.0,
+      "p99": 338.25,
+      "max": 498,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-ARC-E-5shot.jsonl.gz",
+      "requests_sha256": "7753c01e250dd11f2a37b2c798fd45a88c1b641791a21d653dc16f9ed1bd29e4"
+    },
+    "ARC-C/0": {
+      "dataset": "allenai/ai2_arc",
+      "revision": "210d026faf9955653af8916fad021475a3f00453",
+      "dataset_config": "ARC-Challenge",
+      "task_name": "arc_challenge",
+      "eval_split": "test",
+      "demo_split": null,
+      "documents": 1172,
+      "requests": 4687,
+      "median": 38.0,
+      "p95": 81.0,
+      "p99": 112.57999999999993,
+      "max": 220,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-ARC-C-0shot.jsonl.gz",
+      "requests_sha256": "64474478d8c329e0d89b03e9eb015af8ac2d7f39a19efa45fe14275b61cf5106"
+    },
+    "ARC-C/5": {
+      "dataset": "allenai/ai2_arc",
+      "revision": "210d026faf9955653af8916fad021475a3f00453",
+      "dataset_config": "ARC-Challenge",
+      "task_name": "arc_challenge",
+      "eval_split": "test",
+      "demo_split": "train",
+      "documents": 1172,
+      "requests": 4687,
+      "median": 248.0,
+      "p95": 339.45000000000005,
+      "p99": 384.0,
+      "max": 434,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-ARC-C-5shot.jsonl.gz",
+      "requests_sha256": "7507b41e91be72f9921996fa9abc2b3c8cfba28a27c81c54fd56fa2155969001"
+    },
+    "SciQ/0": {
+      "dataset": "allenai/sciq",
+      "revision": "2c94ad3e1aafab77146f384e23536f97a4849815",
+      "dataset_config": null,
+      "task_name": "sciq",
+      "eval_split": "test",
+      "demo_split": null,
+      "documents": 1000,
+      "requests": 4000,
+      "median": 99.0,
+      "p95": 389.14999999999986,
+      "p99": 559.0,
+      "max": 772,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-SciQ-0shot.jsonl.gz",
+      "requests_sha256": "524e0a90490715e8f88ba939e95bbf09c76e202c00f093dd82b747a662cdbd95"
+    },
+    "SciQ/5": {
+      "dataset": "allenai/sciq",
+      "revision": "2c94ad3e1aafab77146f384e23536f97a4849815",
+      "dataset_config": null,
+      "task_name": "sciq",
+      "eval_split": "test",
+      "demo_split": "train",
+      "documents": 1000,
+      "requests": 4000,
+      "median": 721.0,
+      "p95": 1262.05,
+      "p99": 1581.2099999999998,
+      "max": 1813,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-SciQ-5shot.jsonl.gz",
+      "requests_sha256": "7099793abcbc81b1adc34df9fb4958ca84cbd15ad15e39d71488bae179d159ec"
+    },
+    "LogiQA/0": {
+      "dataset": "EleutherAI/logiqa",
+      "revision": "c1eee1b2fd0ddc87777e36490f7ad54d0b97d141",
+      "dataset_config": null,
+      "task_name": "logiqa",
+      "eval_split": "test",
+      "demo_split": null,
+      "documents": 651,
+      "requests": 2604,
+      "median": 237.0,
+      "p95": 368.5,
+      "p99": 430.5,
+      "max": 564,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-LogiQA-0shot.jsonl.gz",
+      "requests_sha256": "865d13bd26bf35f4cd2e4dff433e8bfdd6cdd73bc7611cd51e7c70171eaa10c6"
+    },
+    "LogiQA/5": {
+      "dataset": "EleutherAI/logiqa",
+      "revision": "c1eee1b2fd0ddc87777e36490f7ad54d0b97d141",
+      "dataset_config": null,
+      "task_name": "logiqa",
+      "eval_split": "test",
+      "demo_split": "train",
+      "documents": 651,
+      "requests": 2604,
+      "median": 1395.0,
+      "p95": 1694.5,
+      "p99": 1872.5,
+      "max": 2117,
+      "exceeds": {
+        "2048": {
+          "count": 1,
+          "fraction": 0.0015360983102918587
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-LogiQA-5shot.jsonl.gz",
+      "requests_sha256": "3cdc9a2f760479dd18060190818f917d64dae4cf63a090ff486f322b7938d2b0"
+    },
+    "BoolQ/0": {
+      "dataset": "aps/super_glue",
+      "revision": "3de24cf8022e94f4ee4b9d55a6f539891524d646",
+      "dataset_config": "boolq",
+      "task_name": "boolq",
+      "eval_split": "validation",
+      "demo_split": null,
+      "documents": 3270,
+      "requests": 6540,
+      "median": 152.0,
+      "p95": 316.5499999999997,
+      "p99": 446.30999999999995,
+      "max": 1377,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-BoolQ-0shot.jsonl.gz",
+      "requests_sha256": "a5e84bbd1fec22c9682d1f7d2ec7c8a8d885f0a481228d8aa138843be8cc942d"
+    },
+    "BoolQ/5": {
+      "dataset": "aps/super_glue",
+      "revision": "3de24cf8022e94f4ee4b9d55a6f539891524d646",
+      "dataset_config": "boolq",
+      "task_name": "boolq",
+      "eval_split": "validation",
+      "demo_split": "train",
+      "documents": 3270,
+      "requests": 6540,
+      "median": 1006.0,
+      "p95": 1382.0,
+      "p99": 1578.8599999999997,
+      "max": 2321,
+      "exceeds": {
+        "2048": {
+          "count": 1,
+          "fraction": 0.0003058103975535168
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-BoolQ-5shot.jsonl.gz",
+      "requests_sha256": "bf89345440945cb5689eef414785b29ba41863e4ab83b1252b4a98cb89fff472"
+    },
+    "HellaSwag/0": {
+      "dataset": "Rowan/hellaswag",
+      "revision": "218ec52e09a7e7462a5400043bb9a69a41d06b76",
+      "dataset_config": null,
+      "task_name": "hellaswag",
+      "eval_split": "validation",
+      "demo_split": null,
+      "documents": 10042,
+      "requests": 40168,
+      "median": 110.0,
+      "p95": 141.0,
+      "p99": 149.59000000000015,
+      "max": 170,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-HellaSwag-0shot.jsonl.gz",
+      "requests_sha256": "9cf6f18d82bd20cb53bbcaac33b0ea5220115f8bf02c9931a99d208a23d221ea"
+    },
+    "HellaSwag/5": {
+      "dataset": "Rowan/hellaswag",
+      "revision": "218ec52e09a7e7462a5400043bb9a69a41d06b76",
+      "dataset_config": null,
+      "task_name": "hellaswag",
+      "eval_split": "validation",
+      "demo_split": "train",
+      "documents": 10042,
+      "requests": 40168,
+      "median": 544.0,
+      "p95": 676.0,
+      "p99": 724.0,
+      "max": 801,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-HellaSwag-5shot.jsonl.gz",
+      "requests_sha256": "6035c0ed29f32d04ed40dce82b3ad043a20838fc06f218a6f62744e417c53add"
+    },
+    "RACE-M/0": {
+      "dataset": "ehovy/race",
+      "revision": "2fec9fd81f1dc971569a9b729c43f2f0e6436637",
+      "dataset_config": "middle",
+      "task_name": "rr_race_middle",
+      "eval_split": "test",
+      "demo_split": null,
+      "documents": 1436,
+      "requests": 5744,
+      "median": 294.0,
+      "p95": 470.5,
+      "p99": 559.3000000000002,
+      "max": 640,
+      "exceeds": {
+        "2048": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-RACE-M-0shot.jsonl.gz",
+      "requests_sha256": "b4982d87ea698cd9ee013c4b17c5794d8fbac6bb89d241abd36ea1074a2521c3"
+    },
+    "RACE-M/5": {
+      "dataset": "ehovy/race",
+      "revision": "2fec9fd81f1dc971569a9b729c43f2f0e6436637",
+      "dataset_config": "middle",
+      "task_name": "rr_race_middle",
+      "eval_split": "test",
+      "demo_split": "train",
+      "documents": 1436,
+      "requests": 5744,
+      "median": 1751.0,
+      "p95": 2184.0,
+      "p99": 2361.0,
+      "max": 2557,
+      "exceeds": {
+        "2048": {
+          "count": 170,
+          "fraction": 0.11838440111420613
+        },
+        "4096": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "8192": {
+          "count": 0,
+          "fraction": 0.0
+        },
+        "16384": {
+          "count": 0,
+          "fraction": 0.0
+        }
+      },
+      "requests_file": "requests-RACE-M-5shot.jsonl.gz",
+      "requests_sha256": "7a47a38cf39e4f7ba3692798c7a5fef6db4071718491d62f6084e9c31e4aec41"
+    }
+  },
+  "uniform_untruncated_tokens_required": 2557,
+  "active_tasks": [
+    "LAMBADA",
+    "PIQA",
+    "WinoGrande",
+    "ARC-E",
+    "ARC-C",
+    "SciQ",
+    "LogiQA",
+    "BoolQ",
+    "HellaSwag",
+    "RACE-M"
+  ],
+  "excluded_tasks": [
+    "RACE-H"
+  ]
+}

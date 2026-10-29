@@ -1,0 +1,12 @@
+{
+  "cimec/lambada": "5953bd97664b64b95754f299b2309ecfbfbe81b9",
+  "baber/piqa": "142f6d7367fd9877f0fb3b5734ea6a545f54cdd1",
+  "allenai/winogrande": "01e74176c63542e6b0bcb004dcdea22d94fb67b5",
+  "allenai/ai2_arc": "210d026faf9955653af8916fad021475a3f00453",
+  "allenai/sciq": "2c94ad3e1aafab77146f384e23536f97a4849815",
+  "EleutherAI/logiqa": "c1eee1b2fd0ddc87777e36490f7ad54d0b97d141",
+  "github:lgw863/LogiQA-dataset": "ff6c4cbca47627b3ac2da94a29fa28204a167b41",
+  "aps/super_glue": "3de24cf8022e94f4ee4b9d55a6f539891524d646",
+  "Rowan/hellaswag": "218ec52e09a7e7462a5400043bb9a69a41d06b76",
+  "ehovy/race": "2fec9fd81f1dc971569a9b729c43f2f0e6436637"
+}

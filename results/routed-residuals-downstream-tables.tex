@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[a3paper,landscape,margin=16mm]{geometry}
+\usepackage{booktabs,multirow,graphicx}
+\pagestyle{empty}
+\begin{document}
+\begin{table}[p]\centering
+\caption{Zero-shot downstream evaluation. Scores in percent; best values within each size are bold.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrrrrrrrr}
+\toprule
+Size & Model & PPL$\downarrow$ & LAMBADA & PIQA & WinoGrande & ARC-E & ARC-C & SciQ & LogiQA & BoolQ & HellaSwag & RACE-M & Avg \\
+\midrule
+700M & Transformer & 9.72 & 30.60 & 68.61 & 54.30 & \textbf{60.31} & 29.78 & 88.30 & 23.35 & 59.94 & 45.55 & 39.42 & 50.02 \\
+ & AttnRes & 9.67 & 31.22 & 68.44 & 51.54 & 58.59 & \textbf{32.34} & 87.50 & 23.35 & \textbf{61.41} & 45.81 & 40.95 & 50.11 \\
+ & MUDDFormer & 9.38 & 33.38 & 68.61 & 53.91 & 57.70 & \textbf{32.34} & \textbf{89.90} & \textbf{23.96} & 60.58 & 47.05 & 40.53 & 50.80 \\
+ & M3 (dd40) & \textbf{9.31} & \textbf{35.82} & \textbf{68.88} & 52.96 & 57.79 & 30.80 & 89.00 & 22.27 & 61.22 & \textbf{48.08} & 41.64 & 50.85 \\
+ & M3 (dd80) & \textbf{9.31} & 34.29 & 68.66 & \textbf{55.25} & 59.93 & 31.57 & 89.60 & 22.27 & 61.25 & 47.62 & \textbf{41.99} & \textbf{51.24} \\
+\midrule
+1.4B & Transformer & 8.33 & 38.29 & 71.38 & 58.64 & \textbf{64.65} & 35.49 & 90.40 & 20.74 & 61.04 & 54.56 & 42.97 & 53.82 \\
+ & AttnRes & 8.21 & 39.39 & \textbf{71.65} & \textbf{59.04} & 62.71 & \textbf{37.63} & 91.00 & \textbf{24.42} & 62.42 & 54.71 & 42.27 & 54.52 \\
+ & M3 (dd26) & \textbf{8.07} & \textbf{40.97} & 70.84 & 58.88 & 63.76 & 35.92 & \textbf{91.70} & 22.89 & \textbf{64.28} & \textbf{55.92} & \textbf{46.17} & \textbf{55.13} \\
+\midrule
+1.8B / A0.38B & Transformer & 9.73 & 27.38 & 67.63 & 52.17 & \textbf{56.02} & 30.12 & 84.80 & 21.81 & \textbf{61.44} & 44.33 & 35.93 & 48.16 \\
+ & AttnRes & 11.12 & 25.07 & 63.82 & 52.96 & 48.91 & 26.54 & 83.80 & 22.89 & 60.37 & 38.74 & 36.84 & 45.99 \\
+ & MUDDFormer & 9.97 & 28.90 & 66.59 & 52.49 & 53.91 & 29.78 & 86.40 & \textbf{24.42} & 58.50 & 43.03 & \textbf{39.14} & 48.32 \\
+ & M3 (dd64) & \textbf{9.67} & \textbf{30.33} & \textbf{67.68} & \textbf{53.20} & 54.76 & \textbf{30.29} & \textbf{87.50} & 23.66 & 55.78 & \textbf{44.84} & 37.81 & \textbf{48.58} \\
+\midrule
+4.6B / A0.89B & Transformer & 8.07 & 35.51 & \textbf{72.74} & 56.99 & 63.05 & \textbf{36.26} & \textbf{90.00} & \textbf{20.28} & 55.41 & 54.16 & 42.41 & 52.68 \\
+ & M3 (dd96) & \textbf{8.02} & \textbf{38.00} & 71.06 & \textbf{57.06} & \textbf{64.23} & 36.01 & 89.80 & 19.35 & \textbf{59.85} & \textbf{54.56} & \textbf{43.25} & \textbf{53.32} \\
+\bottomrule
+\end{tabular}}
+\par\smallskip\footnotesize\raggedright
+Metrics: PIQA, ARC-E, ARC-C and HellaSwag use acc_norm; the other six tasks use accuracy. Avg is the unweighted mean of these ten scores. PPL is from the original held-out language-model validation set, is identical across shot settings, and is excluded from Avg. RACE-H is excluded. AttnRes denotes Block Attention Residuals (4 Transformer layers per block). M3 denotes dd; group counts are shown. The 1.4B dd26 uses no PrePostDANorm. MoE sizes are rounded total / active parameters; A denotes active parameters. Bold indicates the best displayed value within a size, including rounded ties. Protocol: LAMBADA standard; RACE-M evaluated per question; fixed few-shot seed 47. Context cap 4096, no prompt truncation and no RoPE modification. Training context is 2048. In 5-shot, 170 RACE-M questions and one question each in LogiQA and BoolQ exceed 2048; the longest prompt plus answer is 2557 tokens. Single training seed; no statistical-significance claim. Pretraining/benchmark near-duplicate decontamination has not been audited. Inference: Dense BF16 with causal SDPA; MoE FP32 parameters with BF16 autocast. Large-MoE diagnostics showed shape-dependent logits; fixed-shape causality passed.
+\end{table}
+\clearpage
+\begin{table}[p]\centering
+\caption{Five-shot downstream evaluation. Scores in percent; best values within each size are bold.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrrrrrrrr}
+\toprule
+Size & Model & PPL$\downarrow$ & LAMBADA & PIQA & WinoGrande & ARC-E & ARC-C & SciQ & LogiQA & BoolQ & HellaSwag & RACE-M & Avg \\
+\midrule
+700M & Transformer & 9.72 & 29.90 & 68.72 & 55.33 & 65.70 & 32.85 & 90.20 & 22.43 & \textbf{62.26} & 45.71 & 41.50 & 51.46 \\
+ & AttnRes & 9.67 & 30.04 & 67.41 & 52.80 & 66.37 & 34.04 & 90.60 & 20.58 & 56.73 & 45.37 & 41.57 & 50.55 \\
+ & MUDDFormer & 9.38 & 30.56 & 68.66 & 54.06 & 68.48 & 34.47 & 90.40 & \textbf{25.04} & 58.65 & 47.06 & 42.20 & 51.96 \\
+ & M3 (dd40) & \textbf{9.31} & 33.05 & 68.88 & 54.85 & 67.76 & \textbf{34.90} & \textbf{92.10} & 23.04 & 59.45 & \textbf{47.99} & \textbf{44.01} & \textbf{52.60} \\
+ & M3 (dd80) & \textbf{9.31} & \textbf{33.71} & \textbf{69.04} & \textbf{55.96} & \textbf{68.69} & \textbf{34.90} & 91.80 & 23.35 & 53.15 & 47.84 & 43.38 & 52.18 \\
+\midrule
+1.4B & Transformer & 8.33 & 36.25 & \textbf{72.25} & 59.35 & 72.39 & 39.16 & 93.90 & 22.43 & 62.78 & 54.67 & 45.26 & 55.85 \\
+ & AttnRes & 8.21 & 40.40 & 71.55 & 58.64 & 72.35 & \textbf{40.36} & 93.40 & \textbf{23.50} & \textbf{62.97} & 54.72 & 44.85 & 56.27 \\
+ & M3 (dd26) & \textbf{8.07} & \textbf{40.42} & 71.65 & \textbf{61.17} & \textbf{72.90} & 39.51 & \textbf{94.60} & 21.81 & 59.69 & \textbf{56.28} & \textbf{47.14} & \textbf{56.52} \\
+\midrule
+1.8B / A0.38B & Transformer & 9.73 & 26.14 & \textbf{69.04} & 51.85 & \textbf{65.78} & \textbf{33.28} & 88.60 & 25.81 & 56.82 & 44.19 & 36.00 & 49.75 \\
+ & AttnRes & 11.12 & 24.65 & 64.64 & 53.59 & 56.40 & 28.24 & 85.80 & 22.58 & 43.46 & 38.07 & 36.00 & 45.34 \\
+ & MUDDFormer & 9.97 & 24.53 & 67.90 & \textbf{54.30} & 63.05 & 32.76 & \textbf{89.20} & 25.81 & \textbf{59.36} & 42.87 & \textbf{39.35} & \textbf{49.91} \\
+ & M3 (dd64) & \textbf{9.67} & \textbf{26.57} & 67.57 & 51.38 & 64.65 & 32.34 & 89.10 & \textbf{26.73} & 53.06 & \textbf{44.84} & 38.65 & 49.49 \\
+\midrule
+4.6B / A0.89B & Transformer & 8.07 & \textbf{36.99} & \textbf{73.01} & \textbf{56.99} & \textbf{71.97} & \textbf{40.27} & 92.30 & 21.51 & 60.24 & 54.24 & 43.31 & 55.08 \\
+ & M3 (dd96) & \textbf{8.02} & 36.02 & 71.60 & 56.67 & \textbf{71.97} & 38.74 & \textbf{93.30} & \textbf{23.96} & \textbf{61.19} & \textbf{55.14} & \textbf{46.03} & \textbf{55.46} \\
+\bottomrule
+\end{tabular}}
+\par\smallskip\footnotesize\raggedright
+Metrics: PIQA, ARC-E, ARC-C and HellaSwag use acc_norm; the other six tasks use accuracy. Avg is the unweighted mean of these ten scores. PPL is from the original held-out language-model validation set, is identical across shot settings, and is excluded from Avg. RACE-H is excluded. AttnRes denotes Block Attention Residuals (4 Transformer layers per block). M3 denotes dd; group counts are shown. The 1.4B dd26 uses no PrePostDANorm. MoE sizes are rounded total / active parameters; A denotes active parameters. Bold indicates the best displayed value within a size, including rounded ties. Protocol: LAMBADA standard; RACE-M evaluated per question; fixed few-shot seed 47. Context cap 4096, no prompt truncation and no RoPE modification. Training context is 2048. In 5-shot, 170 RACE-M questions and one question each in LogiQA and BoolQ exceed 2048; the longest prompt plus answer is 2557 tokens. Single training seed; no statistical-significance claim. Pretraining/benchmark near-duplicate decontamination has not been audited. Inference: Dense BF16 with causal SDPA; MoE FP32 parameters with BF16 autocast. Large-MoE diagnostics showed shape-dependent logits; fixed-shape causality passed.
+\end{table}
+\clearpage
+\end{document}

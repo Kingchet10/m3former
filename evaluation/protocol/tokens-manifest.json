@@ -1,0 +1,182 @@
+{
+  "LAMBADA/0": {
+    "file": "tokens-LAMBADA-0shot.jsonl.gz",
+    "sha256": "10df4049e40808711b7d9c367c24a373c186a3ba054e6bd7db636111eee8ac0b",
+    "requests": 5153,
+    "references": "references-LAMBADA.json",
+    "references_sha256": "4320267bf810b907d4c10df7c3cd3ca4d7c39ee74b95accf4458089d603e1940",
+    "request_sha256": "0b68a77fb2c7b9c6aefb0d64f295281cd537c33e46c1e5a837e47055686d2ef9",
+    "documents": 5153
+  },
+  "LAMBADA/5": {
+    "file": "tokens-LAMBADA-5shot.jsonl.gz",
+    "sha256": "a879b2337b18484fe270f738b516aeae476497458f9b6dcfcd92e79bfded172b",
+    "requests": 5153,
+    "references": "references-LAMBADA.json",
+    "references_sha256": "4320267bf810b907d4c10df7c3cd3ca4d7c39ee74b95accf4458089d603e1940",
+    "request_sha256": "7583d046bface4046d66ab3a0a943704bf05dac01f59004b8d45154b969b9077",
+    "documents": 5153
+  },
+  "PIQA/0": {
+    "file": "tokens-PIQA-0shot.jsonl.gz",
+    "sha256": "90555ff56373abfa3ae1d9aeced4c2b3aaadae293efb46bb352f2d563cbfcbaa",
+    "requests": 3676,
+    "references": "references-PIQA.json",
+    "references_sha256": "6dddf68f04788faca4e8835ac44870afa0992139555eb71086d8b8cde9800232",
+    "request_sha256": "8cee3e0fec9fdf15fd951124c161fd1727ea63f9a8e73094ca6bb3bfb8111f4e",
+    "documents": 1838
+  },
+  "PIQA/5": {
+    "file": "tokens-PIQA-5shot.jsonl.gz",
+    "sha256": "34deda9d37e417cc49bd8219f8e9e3f907fadfd3d201aca163cc527ebf839fdc",
+    "requests": 3676,
+    "references": "references-PIQA.json",
+    "references_sha256": "6dddf68f04788faca4e8835ac44870afa0992139555eb71086d8b8cde9800232",
+    "request_sha256": "75fee1386e3217240a767a92e97c6268fe30decbf6c59568f8d7917a8aa901b3",
+    "documents": 1838
+  },
+  "WinoGrande/0": {
+    "file": "tokens-WinoGrande-0shot.jsonl.gz",
+    "sha256": "7331428c5b44f8ab1da968fdc054b9596aefda913daeefd9bad5233b4c4257ab",
+    "requests": 2534,
+    "references": "references-WinoGrande.json",
+    "references_sha256": "806c3daff4c697c1b8db900fbc17195d2a1fba68377eabec50b0d215f74b7528",
+    "request_sha256": "01dfe4f109304532f0a85434a40b1750c4cae6d00699c8a410ad4586236805d4",
+    "documents": 1267
+  },
+  "WinoGrande/5": {
+    "file": "tokens-WinoGrande-5shot.jsonl.gz",
+    "sha256": "e1516762fe462a535f27851530bd24ec46907d0442adf1b6cf62d3ec90cb6ac4",
+    "requests": 2534,
+    "references": "references-WinoGrande.json",
+    "references_sha256": "806c3daff4c697c1b8db900fbc17195d2a1fba68377eabec50b0d215f74b7528",
+    "request_sha256": "f82ee1def549045862f1c911dcb3795c61a26b23e2f8b8c9d0e158d1bed7a8a7",
+    "documents": 1267
+  },
+  "ARC-E/0": {
+    "file": "tokens-ARC-E-0shot.jsonl.gz",
+    "sha256": "a5877520d8ec556b74a0cb38ab99b257520856156eb26dfd33e3441cc88e5b89",
+    "requests": 9501,
+    "references": "references-ARC-E.json",
+    "references_sha256": "b48f8fe366fce1fc0aa0789bf373c047b1131bcb50e81b701a1a7066d920f9ce",
+    "request_sha256": "65752f03bcff7766c7cc0ae7b45a2a63866466a169bc3f4ca4d2982bac27de82",
+    "documents": 2376
+  },
+  "ARC-E/5": {
+    "file": "tokens-ARC-E-5shot.jsonl.gz",
+    "sha256": "7011447da62f3cccee1963977f5c5b519ec4216fccfaaaa55a55f7b6efbaed45",
+    "requests": 9501,
+    "references": "references-ARC-E.json",
+    "references_sha256": "b48f8fe366fce1fc0aa0789bf373c047b1131bcb50e81b701a1a7066d920f9ce",
+    "request_sha256": "7753c01e250dd11f2a37b2c798fd45a88c1b641791a21d653dc16f9ed1bd29e4",
+    "documents": 2376
+  },
+  "ARC-C/0": {
+    "file": "tokens-ARC-C-0shot.jsonl.gz",
+    "sha256": "c9b52128994039b726238ada55ab7e8ffb9afcdc6b2160b01da05a30db0c87f6",
+    "requests": 4687,
+    "references": "references-ARC-C.json",
+    "references_sha256": "fca4aa8474ba3f4815b61ebece0a5382cfb3efd08df9e4d1a6a4fd3697cb400b",
+    "request_sha256": "64474478d8c329e0d89b03e9eb015af8ac2d7f39a19efa45fe14275b61cf5106",
+    "documents": 1172
+  },
+  "ARC-C/5": {
+    "file": "tokens-ARC-C-5shot.jsonl.gz",
+    "sha256": "ff1c5af68552da07b907aa04a8cbd3cd8f9a6ba9d5a5e7719b4b6a220bb37fd5",
+    "requests": 4687,
+    "references": "references-ARC-C.json",
+    "references_sha256": "fca4aa8474ba3f4815b61ebece0a5382cfb3efd08df9e4d1a6a4fd3697cb400b",
+    "request_sha256": "7507b41e91be72f9921996fa9abc2b3c8cfba28a27c81c54fd56fa2155969001",
+    "documents": 1172
+  },
+  "SciQ/0": {
+    "file": "tokens-SciQ-0shot.jsonl.gz",
+    "sha256": "32d5b309ecadcb3ede5a889edb1ce59b55d02d98404f4b4cdecfd88d2c0ba18c",
+    "requests": 4000,
+    "references": "references-SciQ.json",
+    "references_sha256": "ae75b89e4397019a54565e16a2c7957b1f23c395f5f96f796ca03bd0467a2ee2",
+    "request_sha256": "524e0a90490715e8f88ba939e95bbf09c76e202c00f093dd82b747a662cdbd95",
+    "documents": 1000
+  },
+  "SciQ/5": {
+    "file": "tokens-SciQ-5shot.jsonl.gz",
+    "sha256": "54739b21f5b9fa2ed1cc740371496da1608b3104081eeb5dd5ee0a2612d26aa8",
+    "requests": 4000,
+    "references": "references-SciQ.json",
+    "references_sha256": "ae75b89e4397019a54565e16a2c7957b1f23c395f5f96f796ca03bd0467a2ee2",
+    "request_sha256": "7099793abcbc81b1adc34df9fb4958ca84cbd15ad15e39d71488bae179d159ec",
+    "documents": 1000
+  },
+  "LogiQA/0": {
+    "file": "tokens-LogiQA-0shot.jsonl.gz",
+    "sha256": "f394bac4c034eb7dfcacb4461ee1e2971a3246a5aad8e961e55bb3d6ebc3acab",
+    "requests": 2604,
+    "references": "references-LogiQA.json",
+    "references_sha256": "cd092931f84c7cc06aa5d0f564a009dbac1520cfd1f4bdd2a1216de94bf40be2",
+    "request_sha256": "865d13bd26bf35f4cd2e4dff433e8bfdd6cdd73bc7611cd51e7c70171eaa10c6",
+    "documents": 651
+  },
+  "LogiQA/5": {
+    "file": "tokens-LogiQA-5shot.jsonl.gz",
+    "sha256": "0359e4be193afdddc8dde8840fa194c7c21184f122d0b5dd140be66777995546",
+    "requests": 2604,
+    "references": "references-LogiQA.json",
+    "references_sha256": "cd092931f84c7cc06aa5d0f564a009dbac1520cfd1f4bdd2a1216de94bf40be2",
+    "request_sha256": "3cdc9a2f760479dd18060190818f917d64dae4cf63a090ff486f322b7938d2b0",
+    "documents": 651
+  },
+  "BoolQ/0": {
+    "file": "tokens-BoolQ-0shot.jsonl.gz",
+    "sha256": "ba46949ea1cf00c7e1f001420d54c21c7ebaddaed6bf451707a93dad7f6535ca",
+    "requests": 6540,
+    "references": "references-BoolQ.json",
+    "references_sha256": "9fbb830013261db897daa14c77dd24fae42e5a87cbbfef1505db7e5ea4d328ce",
+    "request_sha256": "a5e84bbd1fec22c9682d1f7d2ec7c8a8d885f0a481228d8aa138843be8cc942d",
+    "documents": 3270
+  },
+  "BoolQ/5": {
+    "file": "tokens-BoolQ-5shot.jsonl.gz",
+    "sha256": "09a66dfa17b55a13067298361e0abb1e1e47629b7e2783dded655069abae39bf",
+    "requests": 6540,
+    "references": "references-BoolQ.json",
+    "references_sha256": "9fbb830013261db897daa14c77dd24fae42e5a87cbbfef1505db7e5ea4d328ce",
+    "request_sha256": "bf89345440945cb5689eef414785b29ba41863e4ab83b1252b4a98cb89fff472",
+    "documents": 3270
+  },
+  "HellaSwag/0": {
+    "file": "tokens-HellaSwag-0shot.jsonl.gz",
+    "sha256": "e251fb100d0b3e410d091f11198c9b1bc8bc17b30c3b017335d20a325922bafe",
+    "requests": 40168,
+    "references": "references-HellaSwag.json",
+    "references_sha256": "415e2f259b2b283272693392866e3ba681df7fa0922a1db17a3da63c1c06cf8c",
+    "request_sha256": "9cf6f18d82bd20cb53bbcaac33b0ea5220115f8bf02c9931a99d208a23d221ea",
+    "documents": 10042
+  },
+  "HellaSwag/5": {
+    "file": "tokens-HellaSwag-5shot.jsonl.gz",
+    "sha256": "d21c780f13ca67c5d46d89fa4f7ff944e397c58a64e804f5e157b9267d53004d",
+    "requests": 40168,
+    "references": "references-HellaSwag.json",
+    "references_sha256": "415e2f259b2b283272693392866e3ba681df7fa0922a1db17a3da63c1c06cf8c",
+    "request_sha256": "6035c0ed29f32d04ed40dce82b3ad043a20838fc06f218a6f62744e417c53add",
+    "documents": 10042
+  },
+  "RACE-M/0": {
+    "file": "tokens-RACE-M-0shot.jsonl.gz",
+    "sha256": "3ff6c60647c5571aa148bb338ece6a29d9951bd6a070017e2ba53151f7074b9f",
+    "requests": 5744,
+    "references": "references-RACE-M.json",
+    "references_sha256": "959e9b0be0f9f03f44a717bc7e6ba811a084a2dd6e0de8c99874508e9926de55",
+    "request_sha256": "b4982d87ea698cd9ee013c4b17c5794d8fbac6bb89d241abd36ea1074a2521c3",
+    "documents": 1436
+  },
+  "RACE-M/5": {
+    "file": "tokens-RACE-M-5shot.jsonl.gz",
+    "sha256": "309a758c20cbc8a360376a19863cacf4751dbfb5b5480fea4d4f1e8df3e8158d",
+    "requests": 5744,
+    "references": "references-RACE-M.json",
+    "references_sha256": "959e9b0be0f9f03f44a717bc7e6ba811a084a2dd6e0de8c99874508e9926de55",
+    "request_sha256": "7a47a38cf39e4f7ba3692798c7a5fef6db4071718491d62f6084e9c31e4aec41",
+    "documents": 1436
+  }
+}
