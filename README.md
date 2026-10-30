@@ -10,11 +10,11 @@
 </p>
 
 <p align="center">
-  <img alt="arXiv" src="https://img.shields.io/badge/arXiv-coming%20soon-b31b1b.svg">
-  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg"></a>
-  <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.12-ee4c2c.svg?logo=pytorch&logoColor=white">
-  <img alt="Triton" src="https://img.shields.io/badge/kernels-Triton-6f42c1.svg">
-  <img alt="Backends" src="https://img.shields.io/badge/runs%20on-TorchTitan%20%C2%B7%20Megatron%20Core-76b900.svg">
+  <img alt="arXiv: coming soon" src="assets/badges/arxiv.svg">
+  <a href="LICENSE"><img alt="License: Apache 2.0" src="assets/badges/license.svg"></a>
+  <img alt="PyTorch 2.12" src="assets/badges/pytorch.svg">
+  <img alt="Kernels: Triton" src="assets/badges/triton.svg">
+  <img alt="Runs on TorchTitan and Megatron Core" src="assets/badges/backends.svg">
 </p>
 
 ---
