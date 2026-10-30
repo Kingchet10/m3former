@@ -1,4 +1,4 @@
-"""Read immutable int32 Megatron documents as the author's next-token pairs.
+"""Read int32 Megatron indexed documents as next-token pairs (format megatron_document_pairs_v1, docs/DATA.md).
 
 Each document contributes (ids[:-1], ids[1:]); never predict across documents.
 Only a cumulative pair-offset index is added, not a second copy of the corpus.

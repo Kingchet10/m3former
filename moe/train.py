@@ -90,9 +90,9 @@ def main():
     r = json.loads(Path(args.config).read_text())
     if 'performance' in r:
         perf=r['performance']
-        for key,env in [('packed_experts','RR_PACKED'),('operator_fusion','RR_FUSION'),('compile_rmsnorm','RR_COMPILE_NORM')]:
+        for key,env in [('packed_experts','M3_MOE_PACKED'),('operator_fusion','M3_MOE_FUSION'),('compile_rmsnorm','M3_MOE_COMPILE_NORM')]:
             os.environ[env]=str(int(perf[key]))
-        os.environ['RR_BUCKET_MB']=str(perf['ddp_bucket_mb'])
+        os.environ['M3_MOE_BUCKET_MB']=str(perf['ddp_bucket_mb'])
         torch.set_num_threads(perf['cpu_threads'])
     rank, world = int(os.environ['RANK']), int(os.environ['WORLD_SIZE'])
     local = int(os.environ['LOCAL_RANK'])
@@ -126,7 +126,7 @@ def main():
             except importlib.metadata.PackageNotFoundError: versions[package]=None
         (out/'runtime.json').write_text(json.dumps(dict(versions=versions,cuda=torch.version.cuda,
             gpu=torch.cuda.get_device_name(local),source_root=str(source_root),
-            performance_environment={k:os.environ.get(k) for k in ['RR_PACKED','RR_FUSION','RR_COMPILE_NORM','RR_BUCKET_MB']},
+            performance_environment={k:os.environ.get(k) for k in ['M3_MOE_PACKED','M3_MOE_FUSION','M3_MOE_COMPILE_NORM','M3_MOE_BUCKET_MB']},
             cpu_threads=torch.get_num_threads()),indent=2))
     dist.barrier()
     torch.manual_seed(r['seed']); model_parallel_cuda_manual_seed(r['seed'])
@@ -135,7 +135,7 @@ def main():
                         load_balancing_type=router['load_balancing_type'],
                         aux_loss_coeff=router['aux_loss_coeff'], z_loss_coeff=router['z_loss_coeff']).to(device)
     ddp = DDP(model, device_ids=[local], broadcast_buffers=False, gradient_as_bucket_view=True,
-              bucket_cap_mb=int(os.environ.get('RR_BUCKET_MB','25')))
+              bucket_cap_mb=int(os.environ.get('M3_MOE_BUCKET_MB','25')))
     initial_hash = model_digest(model)
     hashes = [None] * world
     dist.all_gather_object(hashes, initial_hash)
@@ -205,8 +205,8 @@ def main():
         if rank == 0:
             (out/'benchmark.json').write_text(json.dumps(dict(status='complete',steps=args.benchmark_steps,
                 max_memory_allocated=torch.cuda.max_memory_allocated(),max_memory_reserved=torch.cuda.max_memory_reserved(),
-                fusion=os.environ.get('RR_FUSION','0'),bucket_mb=os.environ.get('RR_BUCKET_MB','25'),
-                packed=os.environ.get('RR_PACKED','0'),compile_norm=os.environ.get('RR_COMPILE_NORM','0'),
+                fusion=os.environ.get('M3_MOE_FUSION','0'),bucket_mb=os.environ.get('M3_MOE_BUCKET_MB','25'),
+                packed=os.environ.get('M3_MOE_PACKED','0'),compile_norm=os.environ.get('M3_MOE_COMPILE_NORM','0'),
                 all_ranks_identical=verified_sync),indent=2))
         dist.destroy_process_group()
         return

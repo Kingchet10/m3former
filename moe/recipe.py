@@ -1,4 +1,4 @@
-"""Same cosine formula as optimized-256k; resolved recipes live in configs/."""
+"""Learning rate: linear warmup, then cosine decay to min_lr. The recipes live in configs/."""
 import math
 
 def learning_rate(step, r):

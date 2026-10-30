@@ -1,8 +1,31 @@
-"""History mixing in [sequence, microbatch, hidden] layout; no cross-step cache."""
-import torch
+"""Residual connections of the MoE models: Transformer, MUDDFormer, M3 and block attention residuals.
+
+History mixing in [sequence, microbatch, hidden] layout; no cross-step cache.
+"""
 import os
+import re
+
+import torch
 from torch import nn
 from torch.nn import functional as F
+
+
+# Original run names (left) are accepted so that the released checkpoints load unchanged.
+ALIASES = {'baseline': 'transformer', 'mudd': 'muddformer', 'attnres_block4': 'attnres-block'}
+
+
+def parse_variant(variant):
+    """Return (kind, groups): kind is 'transformer', 'm3' or 'attnres-block'; groups is the number of groups per
+    role of M3 (1 = MUDDFormer) and None otherwise."""
+    v = ALIASES.get(variant, variant)
+    if v == 'muddformer':
+        return 'm3', 1
+    m = re.fullmatch(r'(?:m3-g|dd)(\d+)', v)
+    if m:
+        return 'm3', int(m.group(1))
+    if v in ('transformer', 'attnres-block'):
+        return v, None
+    raise ValueError(f'Unknown MoE variant: {variant}')
 
 
 def _rms(x,weight,eps):
@@ -19,7 +42,7 @@ class RMSNorm(nn.Module):
         self.eps = eps
 
     def forward(self, x):
-        if os.environ.get('RR_COMPILE_NORM','0') == '1' and x.is_cuda:
+        if os.environ.get('M3_MOE_COMPILE_NORM','0') == '1' and x.is_cuda:
             return _compiled_rms(x,self.weight,self.eps)
         y = x.float() * torch.rsqrt(x.float().square().mean(-1, keepdim=True) + self.eps)
         return (y * self.weight).to(x.dtype)
@@ -84,14 +107,14 @@ class ResidualDecoder(nn.Module):
         dim, layers = config.hidden_size, len(self.layers)
         self.mixers = nn.ModuleDict()
         self.readers = nn.ModuleDict()
-        if variant in ('mudd', 'dd96'):
-            groups = 1 if variant == 'mudd' else 96
+        self.kind, groups = parse_variant(variant)
+        if self.kind == 'm3':
             for i in range(1, layers):
                 self.mixers[str(i)] = DepthMixer(dim, i+1, 4, groups)
                 self.layers[i].norm_k = RMSNorm(dim, config.layernorm_epsilon)
                 self.layers[i].norm_v = RMSNorm(dim, config.layernorm_epsilon)
             self.mixers['out'] = DepthMixer(dim, layers+1, 1, groups, expand=4)
-        if variant == 'attnres_block4':
+        if self.kind == 'attnres-block':
             for i in range(layers):
                 for part in ('attn', 'moe'):
                     self.readers[f'{i}_{part}'] = AttentionReader(dim)
@@ -114,7 +137,7 @@ class ResidualDecoder(nn.Module):
         for i, layer in enumerate(self.layers):
             kwargs = dict(attention_mask=attention_mask, rotary_pos_emb=rotary_pos_emb,
                           packed_seq_params=packed_seq_params)
-            if self.variant == 'attnres_block4':
+            if self.kind == 'attnres-block':
                 if i and i % 4 == 0:
                     blocks.append(partial)
                     partial = None
@@ -125,7 +148,7 @@ class ResidualDecoder(nn.Module):
                 x = layer.pre_mlp_layernorm(self.readers[f'{i}_moe'](blocks + [partial]))
                 partial = partial + self.output(layer.mlp(x))
                 continue
-            if self.variant in ('mudd', 'dd96') and i:
+            if self.kind == 'm3' and i:
                 q, k, v, residual = self.mixers[str(i)](history)
                 attn = self.output(layer.self_attention(
                     layer.input_layernorm(q), key_value_states=(layer.norm_k(k), layer.norm_v(v)),
@@ -135,11 +158,11 @@ class ResidualDecoder(nn.Module):
                 attn = self.output(layer.self_attention(layer.input_layernorm(h), **kwargs))
             h = residual + attn
             h = h + self.output(layer.mlp(layer.pre_mlp_layernorm(h)))
-            if self.variant in ('mudd', 'dd96'):
+            if self.kind == 'm3':
                 history.append(h)
-        if self.variant == 'attnres_block4':
+        if self.kind == 'attnres-block':
             h = self.readers['out'](blocks + [partial])
-        elif self.variant in ('mudd', 'dd96'):
+        elif self.kind == 'm3':
             h = self.mixers['out'](history)[0]
         return self.final_layernorm(h)
 

@@ -33,8 +33,8 @@ def main():
     original_inner=[]
     if spec['family']=='dense':
         cfg=json.loads((checkpoint.parent.parent/'config.json').read_text())
-        from torchtitan.experiments.brainfuse_scaling.models import Architecture,model_config
-        a=Architecture(**cfg['architecture']);mc=model_config(a)
+        from m3former.models import load_architecture,model_config
+        a=load_architecture(cfg['architecture']);mc=model_config(a)
         # Build exactly the trained residual model, then switch only the causal
         # attention backend for independent un-packed likelihood sequences.
         with torch.device('cuda'): model=mc.build()
@@ -63,7 +63,7 @@ def main():
         # Save original modules for the causal-backend parity check below.
         for layer in model.layers.values(): original_inner.append((layer.attention,layer.attention.inner_attention))
     else:
-        os.environ.update(RR_PACKED='1',RR_FUSION='1',RR_COMPILE_NORM='1')
+        os.environ.update(M3_MOE_PACKED='1',M3_MOE_FUSION='1',M3_MOE_COMPILE_NORM='1')
         import torch.distributed as dist
         from megatron.core import parallel_state
         from megatron.core.tensor_parallel.random import model_parallel_cuda_manual_seed

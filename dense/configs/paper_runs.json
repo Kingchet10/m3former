@@ -1,0 +1,27 @@
+{
+  "note": "Dense runs of the paper. Every entry is a 20N run plus 5N and 10N branches from its checkpoints; gpus is the number of data-parallel ranks used (global batch 64 x 2048 tokens in all runs).",
+  "runs": [
+    {"size": "100M", "method": "transformer", "gpus": 4},
+    {"size": "100M", "method": "attnres-block", "gpus": 8},
+    {"size": "100M", "method": "muddformer", "gpus": 4},
+    {"size": "100M", "method": "m3-g10", "gpus": 4},
+    {"size": "300M", "method": "transformer", "gpus": 4},
+    {"size": "300M", "method": "attnres-block", "gpus": 8},
+    {"size": "300M", "method": "muddformer", "gpus": 4},
+    {"size": "300M", "method": "m3-g16", "gpus": 4},
+    {"size": "500M", "method": "transformer", "gpus": 4},
+    {"size": "500M", "method": "attnres-block", "gpus": 8},
+    {"size": "500M", "method": "muddformer", "gpus": 4},
+    {"size": "500M", "method": "m3-g18", "gpus": 4},
+    {"size": "700M", "method": "transformer", "gpus": 8},
+    {"size": "700M", "method": "attnres-block", "gpus": 8},
+    {"size": "700M", "method": "muddformer", "gpus": 8},
+    {"size": "700M", "method": "m3-g20", "gpus": 8},
+    {"size": "700M", "method": "m3-g40", "gpus": 4},
+    {"size": "700M", "method": "m3-g80", "gpus": 4},
+    {"size": "1.4B", "method": "transformer", "gpus": 8},
+    {"size": "1.4B", "method": "attnres-block", "gpus": 8},
+    {"size": "1.4B", "method": "muddformer", "gpus": 8},
+    {"size": "1.4B", "method": "m3-g26", "gpus": 8}
+  ]
+}

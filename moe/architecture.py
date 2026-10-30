@@ -1,7 +1,6 @@
-"""Transformer++ MoE backbone. No dataset, optimizer or job submission side effects.
+"""Megatron Core MoE backbone; the residual connection is replaced in residuals.ResidualDecoder.
 
-Source reference: MUDDFormer Table 2 and section 3.2 (24x1024, E16 K2 Dff1408).
-This implements the ordinary residual baseline, not MUDD or grouped residuals.
+No dataset, optimizer or job submission side effects.
 """
 from dataclasses import dataclass, asdict
 import json
@@ -42,7 +41,7 @@ class Architecture:
         }
 
 
-def build_model(*, load_balancing_type, aux_loss_coeff, z_loss_coeff, variant='baseline',
+def build_model(*, load_balancing_type, aux_loss_coeff, z_loss_coeff, variant='transformer',
                 tensor_parallel=1, pipeline_parallel=1, expert_parallel=1,
                 pre_process=True, post_process=True, architecture=None, use_te=True):
     """Build after Megatron distributed/model-parallel initialization.
@@ -56,11 +55,12 @@ def build_model(*, load_balancing_type, aux_loss_coeff, z_loss_coeff, variant='b
     from megatron.core.models.gpt import GPTModel
     from megatron.core.models.gpt.gpt_layer_specs import get_gpt_decoder_block_spec
 
-    # The reference runtime contains optional Qwen3 routing extensions. Keep them
+    # The Megatron Core snapshot contains optional Qwen3 routing extensions. Keep them
     # off explicitly; never invoke its loop/FFN-recurrence entry points.
     os.environ['QWEN3_DEFAULT_MOE'] = '0'
     os.environ['QWEN3_EXPERT_DROPOUT_P'] = '0'
-    assert variant in ('baseline', 'mudd', 'dd96', 'attnres_block4')
+    from residuals import parse_variant
+    parse_variant(variant)
     assert tensor_parallel == pipeline_parallel == expert_parallel == 1
     a = architecture or Architecture()
     kwargs = dict(
@@ -97,7 +97,7 @@ def build_model(*, load_balancing_type, aux_loss_coeff, z_loss_coeff, variant='b
         if field in TransformerConfig.__dataclass_fields__:
             kwargs[field] = False
     config = TransformerConfig(**kwargs)
-    if os.environ.get('RR_FUSION', '0') == '1':
+    if os.environ.get('M3_MOE_FUSION', '0') == '1':
         config.moe_permute_fusion = True
         config.moe_router_fusion = True
         config.bias_activation_fusion = True
@@ -114,7 +114,7 @@ def build_model(*, load_balancing_type, aux_loss_coeff, z_loss_coeff, variant='b
                 return super().gating(inputs)
 
     for layer_spec in spec.layer_specs:
-        # Keep norms explicit for the four separate input streams in MUDD/dd.
+        # Keep norms explicit for the separate query, key and value inputs of MUDDFormer / M3.
         layer_spec.submodules.input_layernorm = RMSNormAdapter
         layer_spec.submodules.pre_mlp_layernorm = RMSNormAdapter
         layer_spec.submodules.self_attention.module = attention_class()
@@ -133,7 +133,7 @@ def build_model(*, load_balancing_type, aux_loss_coeff, z_loss_coeff, variant='b
         rotary_base=a.rotary_base, rope_scaling=False,
     )
     model.decoder = ResidualDecoder(model.decoder, config, variant)
-    if os.environ.get('RR_PACKED','0') == '1':
+    if os.environ.get('M3_MOE_PACKED','0') == '1':
         from packed_experts import replace_experts
         replace_experts(model)
     return model

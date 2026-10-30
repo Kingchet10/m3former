@@ -1,11 +1,24 @@
-# Frozen-request downstream scorer
+# Downstream evaluation
 
-Included: original `worker.py`, `aggregate.py`, and `tokenize_requests.py`, plus protocol metadata and completed result CSVs. Excluded: benchmark prompt/answer text, tokenizer binary, model weights, absolute cluster bindings, and scheduler/controller scripts.
+Zero- and five-shot accuracy on LAMBADA, PIQA, WinoGrande, ARC-Easy, ARC-Challenge, SciQ, LogiQA, BoolQ, HellaSwag
+and RACE (middle school), scored by log-likelihood with the native models of this repository.
 
-`worker.py --root EVAL_ROOT --model RUN --shard 0 --shards 4` expects the original frozen-evaluation directory contract: `execution-models.json`, `models.json`, `tokens-manifest.json`, per-task tokenized request `.jsonl.gz`, per-task references and checkpoint files. `execution-models.json` binds family, source and checkpoint. Set PYTHONPATH to this repository's dense or MoE framework before launching each worker. This export does not automatically generate those external assets.
+The requests (contexts and candidate continuations) were generated with the LM Evaluation Harness at commit
+`d6de81643928d653435c431bae19945d41d32520`, with the dataset revisions in `protocol/dataset-revisions.json` and fixed
+few-shot examples (seed 47). `tokenize_requests.py` tokenizes them with the TinyLlama tokenizer exactly as the
+harness splits context and continuation, without BOS and without truncation (the longest prompt plus answer has
+2,557 tokens; the models run at a context of 4,096 without changing RoPE). The benchmark texts themselves are not
+redistributed here.
 
-Use four shards for the unchanged `aggregate.py`; only aggregate after all four completion receipts exist. The scorer checks weight hashes, strict state-dict loading, finite outputs and causality, retains raw candidate scores, and resumes completed request IDs. Evaluation is not training.
+Scoring:
 
-Protocol: 10 tasks, 0/5-shot, fixed demonstrations seed 47, no RACE-H. LAMBADA standard; RACE middle per question. PIQA/ARC-E/ARC-C/HellaSwag use acc_norm; others acc; Avg is ten-task equal mean, excluding PPL. Context cap 4096, no prompt truncation and no RoPE changes. Some 5-shot prompts exceed training context 2048; maximum complete prompt/candidate length 2557. No near-duplicate decontamination claim.
+1. Export a dense checkpoint with `scripts/export_dense_checkpoint.py` (MoE runs save `final.pt` directly).
+2. Prepare an evaluation directory with `execution-models.json` (for each model: `family` dense or moe, `source`,
+   `checkpoint`), `tokens-manifest.json`, the tokenized requests and the references of every task.
+3. Run `worker.py --root EVAL_ROOT --model NAME --shard i --shards 4` for the four shards, with `PYTHONPATH` set to
+   `dense/` (dense) or `moe/` and `third_party/Megatron-LM` (MoE).
+4. Run `aggregate.py --root EVAL_ROOT --model NAME` after all four shards are complete.
 
-Large MoE cross-shape BF16 output differences were retained in diagnostics. Fixed-shape future-token perturbation checks passed; this is not a claim that logits or all benchmark predictions are invariant to batch shape. See the worker's checks and historical documentation for the boundary.
+The worker checks the weight hashes, loads the state dict strictly, checks causality and finite outputs, keeps the
+raw candidate scores and resumes completed requests. PIQA, ARC-E, ARC-C and HellaSwag use length-normalized accuracy,
+the other tasks accuracy; the average is the unweighted mean of the ten tasks.

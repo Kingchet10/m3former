@@ -1,66 +1,144 @@
-# Routed Residuals — core research implementation
+# M3Former: Fine-Grained Cross-Layer Mixing for Transformers
 
-这是实验代码的独立整理版：重点是**残差计算图如何接入训练框架**，以及同一配方下的 baseline、MUDD、分组 dd/M3、Block Attention Residuals 对照。该仓库不包含训练数据、模型权重、账号凭证或集群提交代码。
+Code for the paper *M3Former: Fine-Grained Cross-Layer Mixing for Transformers*.
 
-## 从这里阅读
+A residual connection gives each Transformer block access to all earlier layers only through one fixed sum, and every
+input of the block reads that same sum. **M3** (Multi-Role Multi-Group Mixing Residual) removes this bottleneck. The
+query, key, value and residual inputs of a block (its four *roles*), and every *group* of channels within a role,
+each read their own token-dependent mixture of all earlier hidden states. One small generator per block produces all
+mixing coefficients from the current token, and a fused Triton kernel reads every earlier state once.
 
-| 部分 | 入口 | 内容 |
-|---|---|---|
-| Dense 方法 | [depth_dendrites.py](dense/torchtitan/experiments/brainfuse_scaling/depth_dendrites.py) | MUDD、分组多路历史混合、单路分组、可选 PrePost |
-| Dense 框架接入 | [models.py](dense/torchtitan/experiments/brainfuse_scaling/models.py) | 用 TorchTitan 构建骨干并替换残差计算图 |
-| Dense Block AttnRes | [block_attn_residuals.py](dense/torchtitan/experiments/brainfuse_scaling/block_attn_residuals.py) | 层间块状态、块内累积和注意力读取 |
-| Dense 训练 | [trainer.py](dense/torchtitan/experiments/brainfuse_scaling/trainer.py) | 训练状态、验证、token 计数及配对初始化 |
-| WSD | [wsd_runtime.py](dense/torchtitan/experiments/brainfuse_scaling/wsd_runtime.py) | 稳定主线、预算末端退火、完整分支状态与恢复检查 |
-| WSD 恢复修复 | [config.py](dense/rr_wsd_rng_fix/config.py) | 指纹审计不消耗恢复后的随机数状态 |
-| MoE 框架接入 | [architecture.py](moe/architecture.py)、[small/architecture.py](moe/variants/small/architecture.py) | Megatron Core 模型与 MoE 配置构造 |
-| MoE 残差方法 | [residuals.py](moe/residuals.py)、[small/residuals.py](moe/variants/small/residuals.py) | 大档 dd96 / 小档 dd64，以及 baseline、MUDD、Block AttnRes 的层连接 |
-| MoE 训练 | [train.py](moe/train.py) | PyTorch DDP、AdamW、文档隔离、验证与最终权重保存 |
-| 速度核心 | [packed_experts.py](moe/packed_experts.py)、[depth_mix_kernel.py](moe/depth_mix_kernel.py) | 打包专家 grouped GEMM、FP32 权重梯度 Triton 核、历史混合核 |
-| 下游评测 | [evaluation/](evaluation/) | 原生 checkpoint 似然评分与完整分片聚合 |
+M3 starts as an exact residual connection: at initialization, M3Former computes exactly the standard Transformer. It
+adds 1.4–3.9% parameters and 1.8–4.3% multiply–adds per token in the models below.
 
-更详细的层次及方法边界见 [FRAMEWORK.md](docs/FRAMEWORK.md)。
+## Results
 
-## 目录
+Validation loss at 20 training tokens per parameter (H200 runs; lower is better):
+
+| Model | Transformer | Block AttnRes | MUDDFormer | **M3Former** | G of M3 |
+|---|---|---|---|---|---|
+| 100M | 2.7976 | 2.7507 | 2.7172 | **2.7126** | 10 |
+| 300M | 2.4367 | 2.4168 | 2.3937 | **2.3825** | 16 |
+| 500M | 2.3452 | 2.3447 | 2.3171 | **2.3039** | 18 |
+| 700M | 2.2747 | 2.2692 | 2.2385 | **2.2309** | 80 |
+| 1.4B | 2.1193 | 2.1053 | diverged | **2.0884** | 26 |
+| MoE 1.8B-A0.38B | 2.2756 | 2.4089 | 2.2995 | **2.2654** | 64 |
+| MoE 4.6B-A0.89B | 2.0881 | – | – | **2.0798** | 96 |
+
+All methods share the recipe and the learning rate of each size. Downstream accuracy is in
+[results/README.md](results/README.md).
+
+## Repository
 
 ```text
-dense/                 TorchTitan 训练所需源码子集、WSD、66 份历史配方
-moe/                   Megatron Core 接入、DDP 训练器、6 份正式配方
-third_party/           实际使用的 Megatron Core 快照、精简 FLA AttnRes 依赖
-scripts/launch.py      可配置数据/输出目录的单节点入口，不申请或调度 GPU
-evaluation/            下游评分与聚合核心、固定评测协议元数据
-results/               完成的 0/5-shot CSV 和两页论文表格
-provenance/            逐文件源码 SHA256、配置来源和整理差异
-licenses/              第三方许可证
+dense/m3former/      M3Former and the baselines on TorchTitan: models, data, trainer, WSD schedule
+  m3.py              M3 (four roles x G groups), MUDDFormer (G = 1) and multi-group mixing
+  mix_kernel.py      fused Triton depth-mixing kernel (forward and backward)
+  block_attn_residuals.py, attn_residuals.py, fla_attnres_op.py   block attention residuals baseline
+  recipe.py          model sizes, methods and the training recipe of the paper
+dense/torchtitan/    the subset of TorchTitan used for training (BSD-3-Clause)
+dense/configs/       the dense runs of the paper
+moe/                 mixture-of-experts models on Megatron Core with a PyTorch DDP/AdamW trainer
+evaluation/          zero- and few-shot likelihood scoring of trained checkpoints
+scripts/             data preparation, launcher, checkpoint export
+third_party/         Megatron Core and the FLA attention-residual kernels used for training
+results/             downstream results of the paper
+tests/               launcher regression test and GPU checks of M3
 ```
 
-Dense 为 **TorchTitan**。MoE 为 **Megatron Core 模型组件 + 自定义 PyTorch DDP/AdamW 训练循环**；TP=PP=EP=1，各 rank 复制全部专家。它不是 Megatron 原生完整训练引擎，也不支持在此配方中直接开启 TP/PP/EP。
+### Methods and names
 
-## 环境与运行
+| Paper | `--method` | Code |
+|---|---|---|
+| Transformer | `transformer` | TorchTitan Llama3 model |
+| MUDDFormer (multi-role mixing) | `muddformer` | `m3.M3Block`, mode `dense`, G = 1 |
+| **M3Former** | `m3-g<G>` | `m3.M3Block`, mode `dense` |
+| Multi-group mixing (ablation) | `multigroup-g<G>` | `m3.M3Block`, mode `dense1` |
+| Block attention residuals | `attnres-block` | `block_attn_residuals.BlockAttnResBlock` (blocks of 4 layers) |
 
-Dense 和 MoE 使用不同的训练环境，请分开管理。Dense 历史环境使用 `torch==2.12.0.dev20260408+cu128`，依赖见 [requirements-edu500m.txt](dense/requirements-edu500m.txt)；MoE 历史环境使用 PyTorch 2.9.0、CUDA 12.8、Transformer Engine 2.11.0、FlashAttention 2.8.3、Triton 3.5.0、NumPy 1.26.4，版本直接来自完成训练的 runtime.json，见 [moe/requirements.txt](moe/requirements.txt)。仓库不复制 Python/CUDA 环境，不保证历史 nightly wheel 仍可下载。不要将任意新版本依赖当成已验证等价。
+G is the number of groups per role. The paper counts it in attention heads: G = H, 2H, 4H for groups of width 64,
+32, 16, where H = d/64 is 10, 16, 18, 20 and 26 from 100M to 1.4B.
 
-需提供已有的冻结 document-pair 数据目录，详见 [DATA.md](docs/DATA.md)。示例中的路径由使用者填写；运行命令即启动训练，`--dry-run` 仅展示命令。
+## Setup
+
+The dense and MoE models use different environments.
+
+- **Dense:** Python 3.11, `torch==2.12.0.dev20260408+cu128`, `pip install -r dense/requirements.txt`.
+- **MoE:** PyTorch 2.9.0, CUDA 12.8, Transformer Engine 2.11.0, FlashAttention 2.8.3, Triton 3.5.0 (`moe/requirements.txt`).
+
+These are the versions of the runs in the paper. Newer versions are likely to work but have not been tested.
+
+## Data
 
 ```bash
-# 在 Dense 环境内，100M baseline 的 20N 主线（原配方 4 GPU）
-python scripts/launch.py dense \
-  --config dense/configs/rr100-base-wsd-20N-1017-edu350-128k-4gpu.json \
-  --data-root /path/to/frozen-data --runs-root /path/to/new-runs
-
-# 在 MoE 环境内，小 MoE dd64（原配方 8 GPU）
-python scripts/launch.py moe --config moe/configs/small/dd64.json \
-  --data-root /path/to/frozen-data --runs-root /path/to/new-runs
+python scripts/prepare_data.py --output /path/to/corpus --tokenizer /path/to/tinyllama/tokenizer.model \
+    --dataset HuggingFaceFW/fineweb-edu --dataset-config sample-350BT --train-tokens 30e9
 ```
 
-Dense 5N/10N 配方要求对应 20N 主线保存的完整锚点；传同一个 `--runs-root`。分支共享主线前缀，不从最终权重反推优化器状态。此次整理**没有加入自动队列、等待全部模型完成条件或自动删除 checkpoint**；分支执行和锚点释放由操作者决定。`dense/export_checkpoint.py` 保留历史验证后导出功能，使用前阅读其命令行和输入清单格式。
+builds a FineWeb-Edu corpus tokenized with the 32K TinyLlama tokenizer, in the format the trainers read. See
+[docs/DATA.md](docs/DATA.md).
 
-## 科研与复现边界
+## Training
 
-- 核心计算源码取自已使用的封存快照，不以重写的教学实现替换正式算子。Dense 以 2026-10-26 AttnRes ladder 的兼容源码为整理基底；不能把这一份快照哈希冒充全部历史运行各自的执行哈希。
-- 保留 Dense baseline/MUDD/dd/AttnRes 的五档三预算配置，以及额外 700M 组数配置。1.4B 原 MUDD 曾失稳；配方存在不代表该终点是可用成功结果。PrePost 模块保留为源码选项，但这次不提供修复后 PrePost 实验的运行复现承诺。
-- 源码按静态 import 闭包收集。原 Dense registry/models 的一些分支仍引用历史研究辅助模块，因此保留其兼容依赖；核心阅读入口以上表为准。Megatron Core 保留完整实际源码子树，避免替换为未经核实的 pip 版本。
-- FLA 仅保留 AttnRes 所需依赖；两个 namespace 的 eager import 被移除，**算子文件未改**。来源及差异见 [PROVENANCE.md](docs/PROVENANCE.md)。
-- 此次没有启动训练、改动历史运行或占用 GPU。整理版的验证范围以 [validation.json](provenance/validation.json) 为准；CPU/导入检查不等于完整 H200 训练验证。
-- 结果表是已经完成的历史评测，不是本整理版重新训练得到的结果。无多种子显著性结论。
+A dense run on one node:
 
-第三方代码保留原许可证及版权头，见 [THIRD_PARTY.md](docs/THIRD_PARTY.md)。本私有研究整理不另行授予第一方代码的公开使用许可。
+```bash
+python scripts/launch.py dense --size 700M --method m3-g80 --budget 20N --gpus 4 \
+    --data-root /path/to/corpus --runs-root /path/to/runs
+```
+
+The 20N run saves the checkpoints from which the 5N and 10N runs branch; launch them afterwards with the same
+`--runs-root` and `--budget 5N` or `--budget 10N`. `python scripts/launch.py dense --paper` lists all dense runs of the
+paper. `--dry-run` prints the command without starting it.
+
+The recipe is AdamW (β = 0.9, 0.95, weight decay 0.1), a global batch of 64 × 2048 tokens, and a warmup–stable–decay
+schedule: warmup over 1% of the 20N run, then a decay to 10% of the peak over the last 20% of each budget. The peak
+learning rate is set per size and shared by all methods (`dense/m3former/recipe.py`). Training runs in BF16 with FP32
+master weights and per-block `torch.compile`.
+
+A MoE run (8 GPUs):
+
+```bash
+python scripts/launch.py moe --config moe/configs/small/m3-g64.json --data-root /path/to/corpus --runs-root /path/to/runs
+```
+
+The MoE recipes (`moe/configs/`) use a global batch of 128 × 2048 tokens and a cosine schedule; see
+[moe/README.md](moe/README.md).
+
+## Evaluation
+
+```bash
+python scripts/export_dense_checkpoint.py RUN/checkpoint/step-N RUN/checkpoint/step-N-model
+```
+
+exports the weights of a dense checkpoint. [evaluation/README.md](evaluation/README.md) describes the scoring of
+the ten benchmarks.
+
+## Tests
+
+```bash
+python tests/test_launch.py      # the launcher reproduces the 66 dense runs of the paper (CPU only)
+python tests/test_m3_gpu.py      # M3 on one GPU: exact initialization, parameter count, fused kernel
+```
+
+## Notes
+
+- 1.4B MUDDFormer diverged with the shared pre-norm recipe; its configuration is kept for completeness.
+- The PrePostNorm variant of the paper (1.4B MUDDFormer and M3Former, Section 5.3) is not part of this release.
+- `dense/configs/paper_runs.json` lists the main runs; the multi-group ablation runs use
+  `--method multigroup-g<G>` with the same recipe.
+
+## Citation
+
+```bibtex
+@article{han2026m3former,
+  title   = {M3Former: Fine-Grained Cross-Layer Mixing for Transformers},
+  author  = {Han, Jiasong and Chai, Yunkai and Zhu, Tong and Zhang, Hengyu and Fang, Wei and Wang, Jintao and Li, Guoqi and Cheng, Yu},
+  year    = {2026}
+}
+```
+
+## License
+
+The code in this repository is released under the [Apache License 2.0](LICENSE). Third-party code keeps its own
+license: TorchTitan (BSD-3-Clause), Megatron Core and FLA; see [docs/THIRD_PARTY.md](docs/THIRD_PARTY.md).

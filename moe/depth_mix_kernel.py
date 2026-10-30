@@ -1,4 +1,4 @@
-"""Fused depth mixing for depth dendrites.
+"""Fused depth mixing for M3.
 
     out[c, r, g*d + i] = sum_j w[r, c, j, g] * h_j[r, g*d + i]        (r = position, c = stream, j = source, g = group)
 
@@ -15,9 +15,9 @@ import triton.language as tl
 
 
 # Program order: group-major (default) launches the G x chunks programs of one row tile back to back, so the per-row
-# mixing weights they all read stay in cache; row-major (SA_DEPTH_GRID=row) is the original order. Every output
+# mixing weights they all read stay in cache; row-major (M3_MIX_GRID=row) is the original order. Every output
 # element is computed by the same arithmetic in both orders, so results are bitwise identical.
-GROUP_MAJOR = os.environ.get('SA_DEPTH_GRID', 'group') != 'row'
+GROUP_MAJOR = os.environ.get('M3_MIX_GRID', 'group') != 'row'
 
 
 def _grid(rows, br, groups, n_chunks):
