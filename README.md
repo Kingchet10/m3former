@@ -25,8 +25,8 @@ channels within a role, reads its own token-dependent mixture of all earlier lay
 
 - **Drop-in.** M3 starts as an exact residual connection, so it replaces the residual connections of a pre-norm
   Transformer without touching anything else.
-- **Cheap.** One small generator per block produces all mixing coefficients; a fused Triton kernel reads every earlier
-  layer once, whatever the number of groups.
+- **One generator.** One small generator per block produces all mixing coefficients from the latest hidden state; a
+  fused Triton kernel computes every mixture in one pass over the earlier layers.
 - **Scales.** Dense models from 100M to 1.4B parameters and sparse mixture-of-experts models up to 4.6B.
 
 ## Quick start
