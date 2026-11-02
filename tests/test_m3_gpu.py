@@ -1,4 +1,4 @@
-"""Checks of M3 on one GPU: exact initialization, parameter count, fused mixing kernel.
+"""Checks of M3 on one GPU: exact initialization, parameter count, fused mixing kernels.
 
     PYTHONPATH=dense:third_party/fla-kernels python tests/test_m3_gpu.py
 """
@@ -79,8 +79,49 @@ def test_fused_mixing():
     print('fused kernel matches the PyTorch loop (forward and backward)')
 
 
+def test_v2_kernels():
+    """mix_kernel_v2 (group-spanning tiles, in-place accumulation of source gradients) against the PyTorch loop:
+    loss and every parameter gradient of a trained-looking model, eager and with per-block torch.compile
+    (fullgraph, as in training)."""
+    torch.manual_seed(0)
+    x = torch.randint(0, 32000, (2, 256), device='cuda')
+    y = torch.randint(0, 32000, (2, 256), device='cuda')
+    pos = torch.arange(x.shape[1], device='cuda')[None].expand_as(x).contiguous()
+
+    def run(model, kernels, fused=True):
+        m3.KERNELS, m3.FUSED = kernels, fused
+        model.zero_grad(set_to_none=True)
+        out = model(x, positions=pos, attention_masks=model.get_attention_masks(positions=pos))
+        loss = torch.nn.functional.cross_entropy(out.float().flatten(0, 1), y.flatten())
+        loss.backward()
+        return loss.detach(), {n: p.grad.detach().clone() for n, p in model.named_parameters() if p.grad is not None}
+
+    for groups, mode in [(1, 'dense'), (16, 'dense'), (64, 'dense'), (16, 'dense1'), (16, 'static')]:
+        model = build(depth_groups=groups, depth_mode=mode)
+        with torch.no_grad():  # move away from the exact residual connection
+            for name, p in model.named_parameters():
+                if name.endswith(('_w2', '_a')):
+                    p.add_(torch.randn_like(p) * 0.2)
+        ref_loss, ref = run(model, 'v1', fused=False)
+        for label, kernels in [('v1', 'v1'), ('v2', 'v2')]:
+            loss, grads = run(model, kernels)
+            torch.testing.assert_close(loss, ref_loss, atol=1e-5, rtol=1e-5)
+            assert grads.keys() == ref.keys()
+            for n in ref:  # FP32; the kernels sum in a different order than the loop (max |grad| ~ 2)
+                torch.testing.assert_close(grads[n], ref[n], atol=1e-4, rtol=1e-4, msg=f'{label} {n}')
+        for layer in model.layers.values():
+            layer.compile(fullgraph=True)
+        loss, grads = run(model, 'v2')
+        torch.testing.assert_close(loss, ref_loss, atol=1e-4, rtol=1e-4)
+        for n in ref:
+            torch.testing.assert_close(grads[n], ref[n], atol=1e-4, rtol=1e-3, msg=f'compiled v2 {n}')
+        print(f'G={groups} {mode}: v1 and v2 kernels (eager and compiled) match the PyTorch loop')
+    m3.KERNELS, m3.FUSED = 'v2', True
+
+
 if __name__ == '__main__':
     test_exact_initialization()
     test_parameter_count()
     test_fused_mixing()
+    test_v2_kernels()
     print('ok')

@@ -43,6 +43,13 @@ gradient clipping at 1.0, sequences of 2,048 tokens, a global batch of 64 sequen
 weights, and per-block `torch.compile`. The schedule is warmup–stable–decay: linear warmup over 1% of the 20N run, then
 a decay to 10% of the peak, 0.1 + 0.9 (1 - sqrt(p)), over the last 20% of each budget.
 
+The mixing kernels are those of `dense/m3former/mix_kernel_v2.py` by default: they keep the hidden states of a
+forward pass in one buffer, add every block's contribution to their gradients in place, and run the query, key and
+value projections as one batched GEMM, which trains faster than the kernels of the runs of the paper
+(`mix_kernel.py`, selected with `M3_MIX_KERNELS=v1`). Both compute the same mixtures in FP32; v2 rounds each
+accumulated gradient of a hidden state to BF16 once per addition instead of twice. Activation checkpointing of M3
+blocks is not supported with v2.
+
 A model with N non-embedding parameters trains on 20N tokens. The 20N run saves complete checkpoints (model, Adam,
 data loader, scheduler and RNG state) where the decay of the 5N and 10N budgets starts; the shorter runs restore them
 and decay from there. Launch the 20N run first and the branches afterwards with the same `--runs-root` and
@@ -77,5 +84,5 @@ exports the weights of a dense checkpoint; MoE runs save their final weights dir
 
 ```bash
 python tests/test_launch.py      # the launcher reproduces the 66 dense runs of the paper (CPU)
-python tests/test_m3_gpu.py      # M3 on one GPU: exact initialization, parameter count, fused kernel
+python tests/test_m3_gpu.py      # M3 on one GPU: exact initialization, parameter count, both kernel versions
 ```

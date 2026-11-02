@@ -139,8 +139,8 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     if resolved is not None:
         (out / 'launch-config.json').write_text(json.dumps(resolved, indent=2) + '\n')
-    for key in [k for k in os.environ if k.startswith('M3_')]:
-        del os.environ[key]  # do not inherit the choices of another run
+    for key in [k for k in os.environ if k.startswith('M3_') and k not in ('M3_MIX_KERNELS', 'M3_FUSED_MIX')]:
+        del os.environ[key]  # do not inherit the choices of another run (the kernel choice is kept: see m3.py)
     subprocess.run(cmd, cwd=ROOT, env={**os.environ, **env}, check=True)
 
 

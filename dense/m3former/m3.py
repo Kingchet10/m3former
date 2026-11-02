@@ -30,7 +30,12 @@ from torch import nn
 from torchtitan.models.llama3.model import Llama3Model, Llama3TransformerBlock
 
 STREAMS = 4  # query, key, value, residual
-FUSED = os.environ.get('M3_FUSED_MIX', '1') != '0'  # Triton mixing kernels (mix_kernel.py); 0 = PyTorch loop
+FUSED = os.environ.get('M3_FUSED_MIX', '1') != '0'  # Triton mixing kernels; 0 = PyTorch loop
+# 'v2' (mix_kernel_v2.py: buffered hidden states, group-spanning tiles, source gradients accumulated in place, and one
+# batched GEMM for the query, key and value projections) or 'v1' (mix_kernel.py and three GEMMs: the code of the runs
+# of the paper). Both compute the same mixtures in FP32; v2 rounds the accumulated source gradients to BF16 once per
+# addition instead of twice.
+KERNELS = os.environ.get('M3_MIX_KERNELS', 'v2')
 MODES = ('dense', 'dense1', 'static')
 
 # Every block has its own input arity (one more source per layer), so torch.compile keeps one graph per block.
@@ -130,12 +135,19 @@ class M3Block(Llama3TransformerBlock):
         w = F.linear(F.gelu(F.linear(xn, w1.to(x.dtype))), w2.to(x.dtype))
         return w.view(b, t, streams, a.shape[1], self.groups) + a.to(x.dtype)
 
-    def mix(self, hiddens, prefix, streams):
+    def mix(self, hiddens, prefix, streams, token=None):
         b, t, d = hiddens[-1].shape
         w = self.mixing_weights(hiddens[-1], prefix, streams)
         if FUSED and hiddens[-1].is_cuda:
-            from .mix_kernel import mix as fused_mix
-            return list(fused_mix(list(hiddens), w.contiguous(), streams, self.groups).unbind(0))
+            if KERNELS == 'v1':
+                from .mix_kernel import mix as fused_mix
+                return list(fused_mix(list(hiddens), w.contiguous(), streams, self.groups).unbind(0))
+            from . import mix_kernel_v2 as v2
+            if token is None:
+                return list(v2.mix(list(hiddens), w.contiguous(), streams, self.groups).unbind(0))
+            # the sources are the buffered hidden states of the pass, and their gradients go to its gradient buffer
+            # (see M3Model.forward)
+            return list(v2.mix_into(token, w.contiguous(), streams, self.groups, d, prefix == 'out').unbind(0))
         out = []
         for c in range(streams):
             acc = None
@@ -155,9 +167,14 @@ class M3Block(Llama3TransformerBlock):
         hd, hpk = proj.head_dim, proj.heads_per_kv
         w = w.view(-1, hpk + 2, hd, w.shape[-1])
         b, t, _ = xq.shape
-        q = F.linear(xq, w[:, :hpk].reshape(-1, w.shape[-1])).view(b, t, -1, hd)
-        k = F.linear(xk, w[:, hpk].reshape(-1, w.shape[-1])).view(b, t, -1, hd)
-        v = F.linear(xv, w[:, hpk + 1].reshape(-1, w.shape[-1])).view(b, t, -1, hd)
+        if hpk == 1 and KERNELS != 'v1':  # multi-head attention: one batched GEMM for the three projections
+            w3 = w.transpose(0, 1).reshape(3, -1, w.shape[-1])
+            qkv = torch.bmm(torch.stack([xq, xk, xv]).view(3, b * t, -1), w3.transpose(1, 2))
+            q, k, v = (y.view(b, t, -1, hd) for y in qkv.unbind(0))
+        else:
+            q = F.linear(xq, w[:, :hpk].reshape(-1, w.shape[-1])).view(b, t, -1, hd)
+            k = F.linear(xk, w[:, hpk].reshape(-1, w.shape[-1])).view(b, t, -1, hd)
+            v = F.linear(xv, w[:, hpk + 1].reshape(-1, w.shape[-1])).view(b, t, -1, hd)
         if att.q_norm is not None:
             q, k = att.q_norm(q), att.k_norm(k)
         q, k = att.rope(q, k, positions)
@@ -165,20 +182,25 @@ class M3Block(Llama3TransformerBlock):
                                 enable_gqa=att.enable_gqa).contiguous()
         return att.wo(o.flatten(2))
 
-    def forward(self, hiddens, attention_masks, positions=None):
+    def forward(self, hiddens, attention_masks, positions=None, token=None):
+        """`hiddens`: h_0 .. h_{l-1}. `token`: token of the anchor of h_{l-1} when the hidden states are buffered and
+        their gradients accumulated in place (v2 kernels, training); then only hiddens[-1] is used (and passed)."""
         if self.layer_id == 0:
             x = hiddens[-1]
             a = self.attention(self.attention_norm(x), attention_masks, positions)
         elif self.mode == 'dense1':  # one mixture is the residual and the attention input
-            x = self.mix(hiddens, 'in', 1)[0]
+            x = self.mix(hiddens, 'in', 1, token)[0]
             a = self.attention(self.attention_norm(x), attention_masks, positions)
         else:
-            xq, xk, xv, x = self.mix(hiddens, 'in', STREAMS)
+            xq, xk, xv, x = self.mix(hiddens, 'in', STREAMS, token)
             a = self.attend(self.attention_norm(xq), self.norm_k(xk), self.norm_v(xv), attention_masks, positions)
         h = x + a
         out = h + self.feed_forward(self.ffn_norm(h))
         if self.layer_id == self.n_layers - 1:
-            out = self.mix(list(hiddens) + [out], 'out', 1)[0]
+            if token is not None:
+                from .mix_kernel_v2 import anchor
+                token = anchor(out, token, self.n_layers)
+            out = self.mix(list(hiddens) + [out], 'out', 1, token)[0]
         return out
 
 
@@ -189,8 +211,20 @@ class M3Model(Llama3Model):
 
     def forward(self, tokens, positions=None, attention_masks=None):
         hiddens = [self.tok_embeddings(tokens)]
-        for layer in self.layers.values():
-            hiddens.append(layer(hiddens, attention_masks, positions))
+        token = None
+        if FUSED and KERNELS != 'v1' and hiddens[0].is_cuda and torch.is_grad_enabled() and hiddens[0].requires_grad:
+            # The hidden states are buffered, and every one gets one gradient plane, to which all mixers that read it
+            # add in backward.
+            from .mix_kernel_v2 import anchor, start_pass
+            token = anchor(hiddens[0], start_pass(hiddens[0], len(self.layers) + 1), 0)
+        n = len(self.layers)
+        for i, layer in enumerate(self.layers.values()):
+            # With buffered states a block reads only the latest one directly: passing all of them would make FSDP's
+            # per-block backward hooks materialize (and autograd add up) a zero gradient for every earlier state.
+            inputs = hiddens if token is None else hiddens[-1:]
+            hiddens.append(layer(inputs, attention_masks, positions, token))
+            if token is not None and i < n - 1:
+                token = anchor(hiddens[-1], token, i + 1)
         h = self.norm(hiddens[-1])
         if self._skip_lm_head:
             return h
