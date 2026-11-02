@@ -24,4 +24,4 @@ tokenizer (32,000 tokens; SHA-256 of `tokenizer.model`:
 
 Token budgets: a model with N non-embedding parameters trains on 20N tokens (5N and 10N for the branches); the
 training split must hold at least 20N label tokens of the largest dense model you train (27.3B for 1.4B). The MoE
-recipes use 10B and 20B tokens.
+recipes train on 20 tokens per active non-embedding parameter (6.2B and 15.9B tokens).

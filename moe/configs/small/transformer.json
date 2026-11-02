@@ -18,8 +18,8 @@
   "global_batch_sequences": 128,
   "sequence_length": 2048,
   "micro_batch_sequences": 16,
-  "train_steps": 38146,
-  "train_tokens": 9999745024,
+  "train_steps": 23644,
+  "train_tokens": 6198132736,
   "performance": {
     "packed_experts": true,
     "operator_fusion": true,
@@ -29,7 +29,7 @@
   },
   "peak_lr": 0.0003,
   "min_lr": 3e-05,
-  "warmup_steps": 382,
+  "warmup_steps": 237,
   "schedule": "cosine",
   "optimizer": "AdamW",
   "betas": [
@@ -44,8 +44,8 @@
   "validation_sequences": 48768,
   "validation_tokens": 99876864,
   "validation_steps": [
-    19073,
-    38146
+    11822,
+    23644
   ],
   "log_every": 10,
   "checkpoint": "final model weights only; no periodic or branch checkpoints",

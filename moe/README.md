@@ -21,11 +21,13 @@ Recipes (`configs/`):
 | Attention heads | 16 | 24 |
 | Experts, top-k, expert width | 64, 8, 352 | 64, 8, 512 |
 | Total / active parameters | 1.83B / 0.38B | 4.59B / 0.89B |
-| Training tokens | 10B | 20B |
+| Active non-embedding parameters | 0.31B | 0.80B |
+| Training tokens | 6.2B | 15.9B |
 | M3 groups G | 64 | 96 |
 | Methods | transformer, muddformer, m3-g64, attnres-block | transformer, m3-g96 |
 
-Both use a global batch of 128 x 2048 tokens, a peak learning rate of 3e-4 with 1% warmup and cosine decay to 10%,
+Both train on 20 tokens per active non-embedding parameter, as the dense models do per non-embedding parameter, and
+use a global batch of 128 x 2048 tokens, a peak learning rate of 3e-4 with 1% warmup and cosine decay to 10%,
 AdamW (0.9, 0.95, weight decay 0.1), BF16 compute with FP32 weights, gradients and Adam states, untied embeddings,
 and a load-balancing loss of 0.01 with a router z-loss of 0.001. Launch with `scripts/launch.py moe --config ...`
 on one node with 8 GPUs; the trainer saves the final weights only.

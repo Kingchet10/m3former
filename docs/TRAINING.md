@@ -61,7 +61,7 @@ python scripts/launch.py moe --config moe/configs/small/m3-g64.json --data-root 
 ```
 
 See [moe/README.md](../moe/README.md) for the architectures and the recipe (global batch 128 x 2048 tokens, cosine
-schedule, 10B and 20B tokens).
+schedule, 20 tokens per active non-embedding parameter).
 
 ## Evaluation
 

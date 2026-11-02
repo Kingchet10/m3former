@@ -37,6 +37,7 @@ class Architecture:
             'active': common + self.topk * one_expert_per_layer,
             'vocabulary_matrices': embeddings,
             'stored_excluding_both_vocabulary_matrices': common - embeddings + self.num_experts * one_expert_per_layer,
+            'active_excluding_both_vocabulary_matrices': common - embeddings + self.topk * one_expert_per_layer,
             'basis': 'analytic unsharded baseline; includes router, two RMSNorms/layer and final RMSNorm; no padding',
         }
 
